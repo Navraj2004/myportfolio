@@ -159,53 +159,78 @@
         });
 
         // Contact form validation
-        const form = document.getElementById('contact-form');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            let isValid = true;
-            const name = form.querySelector('#name');
-            const email = form.querySelector('#email');
-            const message = form.querySelector('#message');
+    const form = document.getElementById('contact-form');
 
-            function setError(input, message) {
-                const formGroup = input.parentElement;
-                const errorMessage = formGroup.querySelector('.error-message');
-                formGroup.classList.add('error');
-                errorMessage.textContent = message;
-                isValid = false;
-            }
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    let isValid = true;
 
-            function clearError(input) {
-                const formGroup = input.parentElement;
-                formGroup.classList.remove('error');
-                formGroup.querySelector('.error-message').textContent = '';
-            }
+    const name = form.querySelector('#name');
+    const email = form.querySelector('#email');
+    const message = form.querySelector('#message');
 
-            clearError(name);
-            clearError(email);
-            clearError(message);
+    function setError(input, messageText) {
+        const formGroup = input.parentElement;
+        const errorMessage = formGroup.querySelector('.error-message');
+        formGroup.classList.add('error');
+        errorMessage.textContent = messageText;
+        isValid = false;
+    }
 
-            if (!name.value.trim()) {
-                setError(name, 'Name is required');
-            }
+    function clearError(input) {
+        const formGroup = input.parentElement;
+        formGroup.classList.remove('error');
+        formGroup.querySelector('.error-message').textContent = '';
+    }
 
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!email.value.trim()) {
-                setError(email, 'Email is required');
-            } else if (!emailRegex.test(email.value.trim())) {
-                setError(email, 'Please enter a valid email');
-            }
+    // Clear previous errors
+    clearError(name);
+    clearError(email);
+    clearError(message);
 
-            if (!message.value.trim()) {
-                setError(message, 'Message is required');
-            } else if (message.value.trim().length < 10) {
-                setError(message, 'Message must be at least 10 characters long');
-            }
+    // Validation checks
+    if (!name.value.trim()) {
+        setError(name, 'Name is required');
+    }
 
-            if (isValid) {
-                // Simulate form submission (replace with actual submission logic)
-                alert('Form submitted successfully!');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.value.trim()) {
+        setError(email, 'Email is required');
+    } else if (!emailRegex.test(email.value.trim())) {
+        setError(email, 'Please enter a valid email');
+    }
+
+    if (!message.value.trim()) {
+        setError(message, 'Message is required');
+    } else if (message.value.trim().length < 10) {
+        setError(message, 'Message must be at least 10 characters long');
+    }
+
+    // If valid, send data to Formspree
+    if (isValid) {
+        const data = new FormData(form);
+
+        try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                alert("✅ Thanks for your message, Navraj will get back to you soon!");
                 form.reset();
+            } else {
+                alert("❌ Something went wrong. Please try again later.");
             }
-        });
+        } catch (error) {
+            alert("❌ Network error. Please try again.");
+        }
+    }
+});
+
+            
+    
     
